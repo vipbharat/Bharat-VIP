@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>BHARAT VIP LIVE</title>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
+    <style>
+        :root { --gold: #fb0; --neon: #0f0; }
+        body { background: #000; color: #fff; font-family: sans-serif; text-align: center; margin: 0; padding-bottom: 50px; }
+        .header { background: #111; padding: 15px; border-bottom: 2px solid var(--gold); margin-bottom: 20px; }
+        .box { border: 2px solid var(--gold); margin: 15px; padding: 25px; border-radius: 15px; background: #0a0a0a; }
+        .res { font-size: 32px; color: var(--neon); font-weight: bold; text-shadow: 0 0 15px var(--neon); text-transform: uppercase; }
+        .admin-btn { background: transparent; color: #111; border: none; margin-top: 60px; cursor: pointer; font-size: 10px; width: 100%; }
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); align-items: center; justify-content: center; z-index: 9999; }
+        .modal-content { background: #1a1a1a; padding: 25px; border: 2px solid var(--gold); border-radius: 20px; width: 85%; max-width: 350px; }
+        input { width: 90%; padding: 12px; margin: 10px 0; background: #000; color: #fff; border: 1px solid #444; border-radius: 8px; text-align: center; font-size: 16px; }
+        .save-btn { background: var(--neon); color: #000; padding: 12px; width: 100%; border: none; border-radius: 8px; font-weight: bold; font-size: 16px; cursor: pointer; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <div class="header"><h1>🏆 BHARAT VIP 🏆</h1></div>
+    <div class="box"><h3>DRAGON TIGER</h3><div id="dt" class="res">LOADING...</div></div>
+    <div class="box"><h3>ANDAR BAHAR</h3><div id="ab" class="res">LOADING...</div></div>
+    <button class="admin-btn" onclick="openAdmin()">ADMIN LOGIN</button>
+
+    <div id="adminModal" class="modal">
+        <div class="modal-content">
+            <h2 style="color:var(--gold);">UPDATE RESULT</h2>
+            <input type="text" id="dt_input" placeholder="Enter DT Result">
+            <input type="text" id="ab_input" placeholder="Enter AB Result">
+            <button class="save-btn" onclick="saveData()">PUBLISH NOW</button>
+            <p onclick="closeAdmin()" style="color:red; cursor:pointer; margin-top:20px;">CLOSE</p>
+        </div>
+    </div>
+
+    <script>
+        // Aapka Naya Firebase URL
+        const firebaseConfig = { databaseURL: "https://bharatvip-78e1c-default-rtdb.firebaseio.com/" };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        // Data Structure Fix: .winner check karein
+        db.ref('liveGame/DT').on('value', (snap) => {
+            const val = snap.val();
+            document.getElementById('dt').innerText = (val && val.winner) ? val.winner : "WAITING...";
+        });
+        db.ref('liveGame/AB').on('value', (snap) => {
+            const val = snap.val();
+            document.getElementById('ab').innerText = (val && val.winner) ? val.winner : "WAITING...";
+        });
+
+        function saveData() {
+            const dtVal = document.getElementById('dt_input').value;
+            const abVal = document.getElementById('ab_input').value;
+            const updates = {};
+            if(dtVal) updates['DT'] = { winner: dtVal.toUpperCase() };
+            if(abVal) updates['AB'] = { winner: abVal.toUpperCase() };
+            db.ref('liveGame').update(updates).then(() => { 
+                alert("Updated!"); 
+                closeAdmin(); 
+            });
+        }
+
+        function openAdmin() { if(prompt("Pass:") === "J1a2y3a4") document.getElementById('adminModal').style.display='flex'; }
+        function closeAdmin() { document.getElementById('adminModal').style.display='none'; }
+    </script>
+</body>
+</html>
